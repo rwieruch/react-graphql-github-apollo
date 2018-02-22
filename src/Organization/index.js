@@ -8,13 +8,19 @@ import Repositories from '../Repositories';
 import REPOSITORY_FRAGMENT from '../Repositories/fragments';
 
 const Organization = ({
-  data: {
+  data
+}) => {
+  const {
     loading,
     error,
     organization,
     fetchMore,
+  } = data;
+
+  if (!data) {
+    return <ErrorMessage error={"Please enter something"} />;
   }
-}) => {
+
   if (loading && !organization) {
     return <Loading isCenter={true} />;
   }
