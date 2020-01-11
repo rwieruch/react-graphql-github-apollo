@@ -70,6 +70,8 @@ const Comments = ({ repositoryOwner, repositoryName, issue }) => (
 
           <CommentAdd
             issue={issue}
+            repositoryOwner={repositoryOwner}
+            repositoryName={repositoryName}
           />
         </Fragment>
       );
