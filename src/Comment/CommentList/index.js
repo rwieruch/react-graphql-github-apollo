@@ -68,7 +68,9 @@ const Comments = ({ repositoryOwner, repositoryName, issue }) => (
             fetchMore={fetchMore}
           />
 
-          <CommentAdd issueId={repository.issue.id} />
+          <CommentAdd
+            issue={issue}
+          />
         </Fragment>
       );
     }}

@@ -23,13 +23,13 @@ class CommentAdd extends Component {
   };
 
   render() {
-    const { issueId } = this.props;
+    const { issue } = this.props;
     const { value } = this.state;
 
     return (
       <Mutation
         mutation={ADD_COMMENT}
-        variables={{ body: value, subjectId: issueId }}
+        variables={{ body: value, subjectId: issue.id }}
       >
         {(addComment, { data, loading, error }) => (
           <div>
