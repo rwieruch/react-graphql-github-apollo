@@ -80,6 +80,23 @@ class CommentAdd extends Component {
       <Mutation
         mutation={ADD_COMMENT}
         variables={{ body: value, subjectId: issue.id }}
+        optimisticResponse={{
+          addComment: {
+            __typename: 'Mutation',
+            commentEdge: {
+              __typename: 'IssueCommentEdge',
+              node: {
+                __typename: 'IssueComment',
+                id: new Date().getTime() + '',
+                author: {
+                  __typename: 'User',
+                  login: 'me'
+                },
+                bodyHTML: value
+              }
+            }
+          }
+        }}
         update={(client, data) => updateComments({
           repositoryOwner,
           repositoryName,
