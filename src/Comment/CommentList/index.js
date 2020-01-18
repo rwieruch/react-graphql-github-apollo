@@ -36,7 +36,7 @@ const updateQuery = (previousResult, { fetchMoreResult }) => {
                 previousEdge => !fetchMoreResult.repository.issue.comments.edges.some(
                   fetchMoreEdge => fetchMoreEdge.node.id === previousEdge.node.id)),
             ...fetchMoreResult.repository.issue.comments.edges
-          ]
+          ].sort((a, b) => a.node.databaseId - b.node.databaseId)
         }
       }
     }
