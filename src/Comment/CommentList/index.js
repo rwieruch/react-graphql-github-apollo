@@ -27,12 +27,19 @@ const updateQuery = (previousResult, { fetchMoreResult }) => {
           ...previousResult.repository.issue.comments,
           ...fetchMoreResult.repository.issue.comments,
           edges: [
-            ...previousResult.repository.issue.comments.edges,
-            ...fetchMoreResult.repository.issue.comments.edges,
-          ],
-        },
-      },
-    },
+            ...previousResult
+              .repository
+              .issue
+              .comments
+              .edges
+              .filter(
+                previousEdge => !fetchMoreResult.repository.issue.comments.edges.some(
+                  fetchMoreEdge => fetchMoreEdge.node.id === previousEdge.node.id)),
+            ...fetchMoreResult.repository.issue.comments.edges
+          ].sort((a, b) => a.node.databaseId - b.node.databaseId)
+        }
+      }
+    }
   };
 };
 
@@ -68,7 +75,11 @@ const Comments = ({ repositoryOwner, repositoryName, issue }) => (
             fetchMore={fetchMore}
           />
 
-          <CommentAdd issueId={repository.issue.id} />
+          <CommentAdd
+            issue={issue}
+            repositoryOwner={repositoryOwner}
+            repositoryName={repositoryName}
+          />
         </Fragment>
       );
     }}

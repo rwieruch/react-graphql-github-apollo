@@ -1,11 +1,61 @@
 import React, { Component } from 'react';
 import { Mutation } from 'react-apollo';
 
+import { GET_COMMENTS_OF_ISSUE } from '../CommentList/queries';
 import { ADD_COMMENT } from './mutations';
 
 import TextArea from '../../TextArea';
 import Button from '../../Button';
 import ErrorMessage from '../../Error';
+
+const updateComments = ({
+  repositoryOwner,
+  repositoryName,
+  issue
+},
+client,
+{
+  data: {
+    addComment: {
+      commentEdge
+    }
+  }
+}
+) => {
+  const data = client.readQuery({
+    query: GET_COMMENTS_OF_ISSUE,
+    variables: {
+      repositoryOwner,
+      repositoryName,
+      number: issue.number
+    }
+  });
+
+  client.writeQuery({
+    query: GET_COMMENTS_OF_ISSUE,
+    variables: {
+      repositoryOwner,
+      repositoryName,
+      number: issue.number
+    },
+    data: {
+      ...data,
+      repository: {
+        ...data.repository,
+        issue: {
+          ...data.repository.issue,
+          comments: {
+            ...data.repository.issue.comments,
+            edges: [
+              ...data.repository.issue.comments.edges,
+              commentEdge
+            ]
+          }
+        }
+      }
+    }
+  })
+};
 
 class CommentAdd extends Component {
   state = {
@@ -23,13 +73,36 @@ class CommentAdd extends Component {
   };
 
   render() {
-    const { issueId } = this.props;
+    const { issue, repositoryOwner, repositoryName } = this.props;
     const { value } = this.state;
 
     return (
       <Mutation
         mutation={ADD_COMMENT}
-        variables={{ body: value, subjectId: issueId }}
+        variables={{ body: value, subjectId: issue.id }}
+        optimisticResponse={{
+          addComment: {
+            __typename: 'Mutation',
+            commentEdge: {
+              __typename: 'IssueCommentEdge',
+              node: {
+                __typename: 'IssueComment',
+                id: new Date().getTime() + '',
+                databaseId: new Date().getTime(),
+                author: {
+                  __typename: 'User',
+                  login: 'me'
+                },
+                bodyHTML: value
+              }
+            }
+          }
+        }}
+        update={(client, data) => updateComments({
+          repositoryOwner,
+          repositoryName,
+          issue
+        }, client, data)}
       >
         {(addComment, { data, loading, error }) => (
           <div>
